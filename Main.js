@@ -23,14 +23,13 @@ var deviceScreen = Dimensions.get('window');
 
 import {observer} from 'mobx-react/native';
 
-@observer
-class CityItem extends Component {
+@observer class CityItem extends Component {
 
 
   render() {
     return (
         <View style={{flexDirection:'column'}}>
-          <View><Text>上海</Text></View>
+          <View><Text>{this.props.city['province']}</Text></View>
           <View style={{borderBottomColor:'gray', borderBottomWidth:1}}></View>
           <View style={{flexDirection:'row'}}>
             <View><Text style={{fontSize:60, paddingTop:40}}>35</Text></View>
@@ -41,8 +40,7 @@ class CityItem extends Component {
   }
 }
 
-@observer
-class App extends Component {
+@observer class App extends Component {
   constructor() {
     super();
     //this.state = {
@@ -50,28 +48,30 @@ class App extends Component {
     //}
   }
 
-  fetch(){
+  fetch() {
     this.props.store.fetch();
   }
 
   render() {
+    let citiesList = this.props.store.cities.map((city)=>{
+      return <CityItem
+                city={city}
+              />;
+    });
+
     return (
-        <Container style={{width:deviceScreen.width}}>
+        <Container>
           <Header>
             <Button transparent>
               <Title>菜单</Title>
             </Button>
             <Title>空气质量</Title>
+            <Button onPress={this.fetch.bind(this)}><Title>刷新</Title></Button>
           </Header>
           <Content style={{backgroundColor:'white'}}>
             <ScrollView>
-              <Button onPress={this.fetch.bind(this)}>刷新</Button>
               <Text>{this.props.store.cities.length}</Text>
-              <CityItem />
-              <CityItem />
-              <CityItem />
-              <CityItem />
-              <CityItem />
+              {citiesList}
             </ScrollView>
           </Content>
         </Container>
