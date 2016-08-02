@@ -23,16 +23,19 @@ var deviceScreen = Dimensions.get('window');
 
 import {observer} from 'mobx-react/native';
 
-@observer class CityItem extends Component {
+class CityItem extends Component {
+  constructor(props){
+    super();
+  }
 
 
   render() {
     return (
         <View style={{flexDirection:'column'}}>
-          <View><Text>{this.props.city['province']}</Text></View>
+          <View><Text>{ this.props.city.c+" | "+ this.props.city.p}</Text></View>
           <View style={{borderBottomColor:'gray', borderBottomWidth:1}}></View>
           <View style={{flexDirection:'row'}}>
-            <View><Text style={{fontSize:60, paddingTop:40}}>35</Text></View>
+            <View><Text style={{fontSize:60, paddingTop:40}}>{this.props.aqi.get(this.props.city.c)}</Text></View>
             <View><Text>全市</Text><View style={{backgroundColor:'green'}}><Text>空气质量优</Text></View></View>
           </View>
           <View><Text>PM 2.5 16 PM10 31 0 57</Text></View>
@@ -41,20 +44,30 @@ import {observer} from 'mobx-react/native';
 }
 
 @observer class App extends Component {
-  constructor() {
+  constructor(props) {
     super();
     //this.state = {
     //  check: true
     //}
+    //props.store.fetchCurrentPM25();
+  }
+
+  componentWillReact() {
+    console.log("I will re-render, since the todo has changed!");
   }
 
   fetch() {
-    this.props.store.fetch();
+    //this.props.store.fetch();
+    //this.props.store.getCitiesList();
+    this.props.store.fetchCurrentPM25();
   }
 
   render() {
+    let aqi = this.props.store.aqi;
     let citiesList = this.props.store.cities.map((city)=>{
+      let cityName = city.c;
       return <CityItem
+                aqi={aqi}
                 city={city}
               />;
     });
@@ -68,9 +81,10 @@ import {observer} from 'mobx-react/native';
             <Title>空气质量</Title>
             <Button onPress={this.fetch.bind(this)}><Title>刷新</Title></Button>
           </Header>
-          <Content style={{backgroundColor:'white'}}>
+          <Content style={{backgroundColor:'white',width:800}}>
             <ScrollView>
               <Text>{this.props.store.cities.length}</Text>
+              <Text>{JSON.stringify(this.props.store.aqi)}</Text>
               {citiesList}
             </ScrollView>
           </Content>
